@@ -1,0 +1,56 @@
+﻿file,row_no,field,expected,got,result
+VERIFY-2569-001.pdf,1,full_name,นางสาวสุพิชญา พลดี อินทร์,นางสาวสุพิชญา พลดีอินทร์,MISS
+VERIFY-2569-001.pdf,3,full_name,นางสาววิชญ์ มณีนิล,นางสาววิชญ์ มณีบิล,MISS
+VERIFY-2569-001.pdf,4,full_name,นางสาวภาคิน อินทรสุข,นางสาวภานิน อินทรสุข,MISS
+VERIFY-2569-001.pdf,5,full_name,นายสุพิชญา มณีนิล,นายสุพิชญา มณีบิล,MISS
+VERIFY-2569-001.pdf,6,full_name,นางสาวธนภัทร มณีนิล,นางสาวธนภร มณีบิล,MISS
+VERIFY-2569-002.pdf,1,full_name,นางสาวกฤษฎา พลดี อินทร์,นางสาวกฤษฎา พลดีอินทร์,MISS
+VERIFY-2569-002.pdf,4,full_name,นางสาวณัฐวุฒิ นาคะศรี,นางสาวณัฐวดี นาคะศรี,MISS
+VERIFY-2569-002.pdf,7,full_name,นายปุณยวีร์ มณีนิล,นายปุณยธรณ์ มณีฉิม,MISS
+VERIFY-2569-002.pdf,8,graduation,fail,pass,MISS
+VERIFY-2569-002.pdf,8,doc_date,incorrect,correct,MISS
+VERIFY-2569-002.pdf,9,graduation,fail,pass,MISS
+VERIFY-2569-002.pdf,9,doc_date,incorrect,correct,MISS
+VERIFY-2569-002.pdf,10,graduation,fail,pass,MISS
+VERIFY-2569-002.pdf,10,doc_date,incorrect,correct,MISS
+VERIFY-2569-003.pdf,1,full_name,นายปุณยวีร์ วงศ์สวัสดิ์,นายปุณณวิวัจน์ วงศ์สวัสดิ์,MISS
+VERIFY-2569-003.pdf,4,full_name,นางสาวภาคิน ทองมาก,นางสาวภาสินี ทองมาก,MISS
+VERIFY-2569-003.pdf,5,full_name,นายญาณิศา มณีนิล,นายญาณิศา มณีเม็ด,MISS
+VERIFY-2569-004.pdf,-,set_no,63716,,MISS
+VERIFY-2569-004.pdf,-,school_code,00010101,,MISS
+VERIFY-2569-004.pdf,1,full_name,นายชลธิชา อินทรสุข,นายชลธีรา อินทรสุข,MISS
+VERIFY-2569-004.pdf,2,full_name,นางสาวณัฐวุฒิ เลิศพิบูลย์,นางสาวณัฐวดี เลิศพิบูลย์,MISS
+VERIFY-2569-004.pdf,3,full_name,นายณัฐวุฒิ ศรีสุวรรณ,นายณัฐภูมิ ศรีสุวรรณ,MISS
+VERIFY-2569-004.pdf,5,full_name,นายกฤษฎา มณีนิล,นายกฤษฎา มณีฉิม,MISS
+VERIFY-2569-004.pdf,5,doc_date,,correct,MISS
+VERIFY-2569-004.pdf,6,full_name,นางสาวธนภัทร จันทร์ประเสริฐ,นางสาวธนภร จันทร์ประเสริฐ,MISS
+VERIFY-2569-004.pdf,7,full_name,นางสาวภาคิน ศรีสุวรรณ,นางสาวภาสินี ศรีสุวรรณ,MISS
+VERIFY-2569-005.pdf,3,faculty,คณะศิลปศาสตร์,คณะนิติศาสตร์,MISS
+VERIFY-2569-005.pdf,4,faculty,คณะศิลปศาสตร์,คณะนิติศาสตร์,MISS
+VERIFY-2569-005.pdf,6,faculty,คณะศิลปศาสตร์,คณะนิติศาสตร์,MISS
+VERIFY-2569-005.pdf,6,doc_date,,correct,MISS
+VERIFY-2569-005.pdf,8,doc_date,,correct,MISS
+VERIFY-2569-006.pdf,1,full_name,นายสุพิชญา มณีนิล,นายสุพิชญา มณีเลิศ,MISS
+VERIFY-2569-006.pdf,4,doc_date,,correct,MISS
+VERIFY-2569-006.pdf,5,full_name,นางสาวปิยธิดา แก้วกาญจน์,นางสาววนิดา แก้วกาญจน์,MISS
+VERIFY-2569-006.pdf,6,full_name,นางสาวธีรภัทร มณีนิล,นางสาวธีรภัทร มณีเลิศ,MISS
+VERIFY-2569-007.pdf,1,full_name,นางสาวภาคิน อินทรสุข,นางสาวภาสินี อินทรสุข,MISS
+VERIFY-2569-007.pdf,2,full_name,นางสาววิชญ์ วงศ์สวัสดิ์,นางสาวขวัญ วงศ์สวัสดิ์,MISS
+VERIFY-2569-007.pdf,3,full_name,นายอริสรา ศรีสุวรรณ,นายอธิราช ศรีสุวรรณ,MISS
+VERIFY-2569-007.pdf,3,faculty,คณะนิเทศศาสตร์,คณะนิติศาสตร์,MISS
+VERIFY-2569-007.pdf,5,graduation,fail,pass,MISS
+VERIFY-2569-007.pdf,5,doc_date,incorrect,correct,MISS
+VERIFY-2569-007.pdf,5,degree,incorrect,correct,MISS
+VERIFY-2569-007.pdf,6,graduation,fail,pass,MISS
+VERIFY-2569-007.pdf,6,doc_date,incorrect,correct,MISS
+VERIFY-2569-007.pdf,6,degree,incorrect,correct,MISS
+VERIFY-2569-007.pdf,7,graduation,fail,pass,MISS
+VERIFY-2569-007.pdf,7,doc_date,incorrect,correct,MISS
+VERIFY-2569-007.pdf,7,degree,incorrect,correct,MISS
+VERIFY-2569-007.pdf,8,faculty,คณะนิเทศศาสตร์,คณะนิติศาสตร์,MISS
+VERIFY-2569-007.pdf,8,graduation,fail,pass,MISS
+VERIFY-2569-007.pdf,8,doc_date,incorrect,correct,MISS
+VERIFY-2569-007.pdf,8,degree,incorrect,correct,MISS
+VERIFY-2569-008.pdf,1,full_name,นายปุณยวีร์ จันทร์ประเสริฐ,นายปุณณธวิช จันทร์ประเสริฐ,MISS
+VERIFY-2569-008.pdf,4,full_name,นายชลธิชา พลดี อินทร์,นายชลธิชา พลี อินทร์,MISS
+VERIFY-2569-008.pdf,6,full_name,นางสาววิชญ์ วงศ์สวัสดิ์,นางสาววิญญ์ วงศ์สวัสดิ์,MISS

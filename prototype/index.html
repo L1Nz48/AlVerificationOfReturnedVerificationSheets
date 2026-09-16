@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ระบบตรวจสอบแบบยืนยันฯ อัตโนมัติ — SPU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- =========================== ICON RAIL =========================== -->
+  <nav class="rail">
+    <div class="rail-brand">
+      <div class="rail-logo">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <div>
+        <div class="rb-t">ผู้ช่วยตรวจเอกสาร AI</div>
+        <div class="rb-s">แบบยืนยันฯ ที่ส่งกลับ · SPU</div>
+      </div>
+    </div>
+
+    <div class="rail-cap">เมนูหลัก</div>
+
+    <button class="rail-btn on" data-page="dashboard">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span><span class="rb-cap">หน้าหลัก</span><span class="rb-sub">ภาพรวมการทำงาน</span></span>
+    </button>
+    <button class="rail-btn" data-page="process">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg>
+      <span><span class="rb-cap">ประมวลผลเอกสาร</span><span class="rb-sub">ขั้นที่ 3–7</span></span>
+    </button>
+    <button class="rail-btn" data-page="queue">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+      <span><span class="rb-cap">คิวตรวจสอบ</span><span class="rb-sub">ขั้นที่ 8–9 · เจ้าหน้าที่</span></span>
+      <span class="rb-dot" id="railBadge" style="display:none">0</span>
+    </button>
+    <button class="rail-btn" data-page="history">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4v5h5"/><path d="M3.5 13a8.5 8.5 0 1 0 2.4-6.2L3 9"/><path d="M12 8v4.5l3 1.8"/></svg>
+      <span><span class="rb-cap">ประวัติการทำงาน</span><span class="rb-sub">Audit trail</span></span>
+    </button>
+    <div class="rail-sep"></div>
+    <button class="rail-btn" data-page="settings">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>
+      <span><span class="rb-cap">ตั้งค่า</span><span class="rb-sub">AI · เกณฑ์ · โฟลเดอร์</span></span>
+    </button>
+
+    <div class="rail-foot">
+      <div class="rail-avatar">อบ</div>
+      <div style="flex:1">
+        <div class="rf-n">อรุณี บุญมี</div>
+        <div class="rf-r">เจ้าหน้าที่งานทะเบียน</div>
+      </div>
+      <button class="tool" id="btnTheme" title="สลับธีม" style="width:30px;height:30px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- =========================== MAIN =========================== -->
+  <div class="main">
+    <header class="hdr">
+      <span class="hdr-step" id="hdrStep">STEP 3–10</span>
+      <div>
+        <div class="hdr-title" id="hdrTitle">ศูนย์ควบคุมการตรวจสอบอัตโนมัติ</div>
+        <div class="hdr-sub" id="hdrSub">ระบบอัตโนมัติ (AI / RPA) — ตรวจแบบยืนยันฯ ที่โรงเรียนต้นสังกัดส่งกลับ</div>
+      </div>
+
+      <div class="telemetry">
+        <div class="tm live"><span class="tm-k">สถานะ</span><span class="tm-v" id="tmEngine">พร้อม</span></div>
+        <div class="tm"><span class="tm-k">ความเร็ว</span><span class="tm-v" id="tmRate">—</span></div>
+        <div class="tm warn"><span class="tm-k">รอตรวจ</span><span class="tm-v" id="tmQueue">0</span></div>
+        <div class="tm ok"><span class="tm-k">SCMS</span><span class="tm-v" id="tmScms">เชื่อมต่อ</span></div>
+        <div class="hdr-tools">
+          <button class="tool" id="btnHelp" title="คำอธิบายขอบเขตระบบ">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="view">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <section class="page on" id="p-dashboard">
+        <div class="dash">
+
+          <div class="flowband">
+            <div class="flowband-hd">
+              <div>
+                <h3 style="margin:0;font-size:14.5px;font-weight:600">ขั้นตอนของระบบอัตโนมัติ (AI / RPA)</h3>
+                <div class="tag-label">ขั้นที่ 3–10 ตาม To-Be Flow — ส่วนที่โปรแกรมนี้รับผิดชอบ</div>
+              </div>
+              <span class="grow"></span>
+              <span class="chip c-gray" id="flowState"><span class="led"></span> พร้อมทำงาน</span>
+            </div>
+            <div class="flow" id="flowNodes"></div>
+          </div>
+
+          <div class="dash-split">
+
+            <!-- left: metric stack -->
+            <div class="panel">
+              <div class="panel-hd"><h3>ตัวชี้วัดรอบล่าสุด</h3><span class="grow"></span><span class="tag-label" id="mstampt">—</span></div>
+              <div class="mstack">
+                <div class="mrow"><span class="m-k">ชุดเอกสารที่รับเข้า</span><span class="m-v num" id="mTotal">0</span><span class="m-u">ชุด</span></div>
+                <div class="mrow accent-lime"><span class="m-k">ผ่านเกณฑ์อัตโนมัติ</span><span class="m-v num" id="mAuto">0</span><span class="m-u">ชุด</span></div>
+                <div class="mrow accent-amber"><span class="m-k">เข้าคิวตรวจสอบ</span><span class="m-v num" id="mEx">0</span><span class="m-u">ชุด</span></div>
+                <div class="mrow accent-cyan"><span class="m-k">บันทึกเข้า SCMS</span><span class="m-v num" id="mPosted">0</span><span class="m-u">ชุด</span></div>
+                <div class="mrow"><span class="m-k">เวลาเฉลี่ยต่อชุด</span><span class="m-v num" id="mAvg">—</span><span class="m-u">วินาที</span></div>
+                <div class="mrow" style="align-items:center"><span class="m-k">แนวโน้ม 7 วัน</span><span class="spark" id="mSpark"></span></div>
+              </div>
+            </div>
+
+            <!-- middle: throughput + feed -->
+            <div>
+              <div class="panel mb">
+                <div class="panel-hd"><h3>ปริมาณเอกสาร 7 วัน</h3><span class="sub">แท่งซ้อน — เขียวคือผ่านอัตโนมัติ, เหลืองคือเข้าคิว</span></div>
+                <div class="tp" id="tpChart"></div>
+              </div>
+              <div class="panel">
+                <div class="panel-hd"><h3>เหตุการณ์ล่าสุด</h3><span class="grow"></span>
+                  <button class="btn btn-sm btn-ghost" data-go="process">ไปหน้าประมวลผล →</button></div>
+                <div class="feed" id="feed">
+                  <div class="empty">ยังไม่มีเหตุการณ์ — เริ่มรอบประมวลผลเพื่อดู log</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- right: donut + rules -->
+            <div>
+              <div class="panel mb">
+                <div class="panel-hd"><h3>สัดส่วนการตัดสิน</h3></div>
+                <div class="donut-wrap">
+                  <div class="donut">
+                    <svg width="116" height="116" viewBox="0 0 116 116">
+                      <circle cx="58" cy="58" r="48" fill="none" stroke="var(--panel-3)" stroke-width="13"/>
+                      <circle id="dnAuto" cx="58" cy="58" r="48" fill="none" stroke="var(--lime)" stroke-width="13" stroke-dasharray="0 999"/>
+                      <circle id="dnEx" cx="58" cy="58" r="48" fill="none" stroke="var(--amber)" stroke-width="13" stroke-dasharray="0 999"/>
+                    </svg>
+                    <div class="donut-mid"><b id="dnPct">—</b><span>ผ่านอัตโนมัติ</span></div>
+                  </div>
+                  <div class="donut-key">
+                    <div><i style="background:var(--lime)"></i> ผ่านอัตโนมัติ <b class="num" id="dnA">0</b></div>
+                    <div><i style="background:var(--amber)"></i> เข้าคิวตรวจ <b class="num" id="dnE">0</b></div>
+                    <div><i style="background:var(--panel-3)"></i> ยังไม่ประมวลผล <b class="num" id="dnR">12</b></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-hd"><h3>กฎบังคับ (ห้ามข้าม)</h3></div>
+                <div class="panel-bd" style="display:flex;flex-direction:column;gap:9px;font-size:12px">
+                  <div style="display:flex;gap:9px"><span class="chip c-red">บังคับ</span><span>ฟอร์มที่ไม่ใช่ของมหาวิทยาลัย = ไม่ผ่านทันที ส่งเจ้าหน้าที่ตรวจ 100%</span></div>
+                  <div style="display:flex;gap:9px"><span class="chip c-red">บังคับ</span><span>เคสหมายเหตุ “ปลอมแปลง” ห้าม Auto-Post ต้องส่งนิติการเสมอ</span></div>
+                  <div style="display:flex;gap:9px"><span class="chip c-cyan">กฎ</span><span>ไม่ใช้ QR — อ้างตัวบุคคลด้วยรหัส นศ. / เลขบัตร ปชช. ในตาราง</span></div>
+                  <div style="display:flex;gap:9px"><span class="chip c-cyan">กฎ</span><span>ทุกค่าที่บันทึกต้องเก็บคู่กับค่าที่ AI อ่านได้ · confidence · หน้าเอกสาร · edited flag</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PROCESS ==================== -->
+      <section class="page" id="p-process">
+        <div class="proc">
+
+          <!-- control column -->
+          <div>
+            <div class="panel mb">
+              <div class="panel-hd"><h3>แหล่งข้อมูล</h3><span class="grow"></span><span class="chip c-cyan" id="srcChip">12 ชุด</span></div>
+              <div class="io-row">
+                <div class="io-k">โฟลเดอร์ต้นทาง (สแกน 300 dpi)</div>
+                <div class="io-p">/Users/spu/VerificationSheets/Inbox</div>
+                <button class="btn btn-sm" onclick="app.toast('info','จำลอง: เลือกโฟลเดอร์ต้นทาง')">เลือกโฟลเดอร์</button>
+              </div>
+              <div class="io-row">
+                <div class="io-k">โฟลเดอร์จัดเก็บภาพต้นฉบับ</div>
+                <div class="io-p">/Users/spu/VerificationSheets/Archive</div>
+                <button class="btn btn-sm" onclick="app.toast('info','จำลอง: เลือกโฟลเดอร์ปลายทาง')">เลือกโฟลเดอร์</button>
+              </div>
+              <div class="io-row">
+                <div class="io-k">ปลายทางบันทึกผล (SCMS)</div>
+                <div class="io-p">https://scms.spu.ac.th/api/v1/verification</div>
+                <span class="chip c-lime"><span class="led"></span> เชื่อมต่อแล้ว</span>
+              </div>
+            </div>
+
+            <div class="panel mb">
+              <div class="panel-hd"><h3>ลำดับการทำงาน</h3><span class="grow"></span><span class="tag-label">ต่อ 1 ชุดเอกสาร</span></div>
+              <div class="track" id="track"></div>
+              <div class="meter">
+                <div class="meter-hd"><span class="mh-k" id="meterK">พร้อมเริ่มประมวลผล</span><span class="mh-v num" id="meterV">0%</span></div>
+                <div class="meter-bar"><i id="meterBar"></i></div>
+                <div class="meter-file" id="meterFile">idle · no document loaded</div>
+              </div>
+            </div>
+
+            <div style="display:grid;gap:8px">
+              <button class="btn btn-lime btn-xl" id="btnStart">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21"/></svg> เริ่มรอบประมวลผล
+              </button>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button class="btn btn-red" id="btnStop" disabled>หยุด</button>
+                <button class="btn" id="btnReset">ล้างผล</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- terminal -->
+          <div class="term">
+            <div class="term-hd">
+              <div>
+                <div class="t-title">บันทึกการทำงานแบบเรียลไทม์</div>
+                <div class="t-sub">แสดงขั้นตอนพร้อมเวลาและสาเหตุเมื่อไม่ผ่านเกณฑ์</div>
+              </div>
+              <span class="grow"></span>
+              <div class="term-filters" id="termFilters">
+                <button class="tf on" data-g="all">ทั้งหมด</button>
+                <button class="tf" data-g="ai">AI</button>
+                <button class="tf" data-g="warn">เตือน</button>
+                <button class="tf" data-g="scms">SCMS</button>
+              </div>
+              <button id="btnClearLog">ล้างบันทึก</button>
+            </div>
+            <div class="term-bd" id="term">
+              <div class="empty">ยังไม่มีบันทึกการทำงาน — กด “เริ่มรอบประมวลผล”</div>
+            </div>
+          </div>
+
+          <!-- results dock -->
+          <div class="panel dock">
+            <div class="panel-hd" style="padding:14px 18px;border-bottom:1px solid var(--line)">
+              <div class="tabs" id="resTabs">
+                <button class="tab on" data-f="all">ทั้งหมด <span class="cnt" id="cAll">0</span></button>
+                <button class="tab" data-f="auto">ผ่านอัตโนมัติ <span class="cnt" id="cAuto">0</span></button>
+                <button class="tab" data-f="exception">เข้าคิวตรวจ <span class="cnt" id="cEx">0</span></button>
+              </div>
+              <span class="grow"></span>
+              <button class="btn btn-sm btn-ghost" data-go="queue">เปิดคิวตรวจ →</button>
+            </div>
+            <div class="scroll-x" style="max-height:420px;overflow-y:auto">
+              <table class="t">
+                <thead><tr>
+                  <th>#</th><th>ชื่อไฟล์</th><th>ชนิดฟอร์ม</th><th>โรงเรียนต้นสังกัด</th>
+                  <th>จำนวนแถว</th><th>อ่านได้</th><th>Confidence</th><th>ลายเซ็น</th><th>ผลการตรวจ</th><th></th>
+                </tr></thead>
+                <tbody id="resBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== QUEUE (3 panes) ==================== -->
+      <section class="page" id="p-queue">
+        <div class="q3">
+          <div class="qcol qcol-list">
+            <div class="qcol-hd"><h3>คิวรอตรวจสอบ</h3><span class="grow"></span><span class="chip c-amber num" id="qCount">0</span></div>
+            <div id="qList"></div>
+          </div>
+
+          <div class="qcol qcol-doc">
+            <div class="qcol-hd">
+              <h3>ภาพเอกสารต้นฉบับ</h3>
+              <div class="scan-tools">
+                <button class="btn btn-sm" onclick="app.toast('info','จำลอง: ซูมภาพ 200%')">＋</button>
+                <button class="btn btn-sm" onclick="app.toast('info','จำลอง: หมุนภาพ')">⟳</button>
+                <button class="btn btn-sm" onclick="app.toast('info','จำลอง: เปิดไฟล์ต้นฉบับ')">เปิดไฟล์</button>
+              </div>
+            </div>
+            <div class="scan-stage" id="scanStage"><div class="empty">เลือกเคสจากคอลัมน์ซ้าย</div></div>
+          </div>
+
+          <div class="qcol qcol-form" id="qForm">
+            <div class="empty">ยังไม่ได้เลือกเคส</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== HISTORY (timeline) ==================== -->
+      <section class="page" id="p-history">
+        <div class="hist">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div>
+              <div style="font-size:16px;font-weight:600">ประวัติการประมวลผล</div>
+              <div class="tag-label">กดที่แถวเพื่อดู Audit Trail ของรอบนั้น</div>
+            </div>
+            <span class="grow" style="margin-left:auto"></span>
+            <button class="btn btn-sm" onclick="app.toast('info','จำลอง: ส่งออก audit log เป็น CSV')">ส่งออก CSV</button>
+          </div>
+          <div class="hline" id="histList"></div>
+        </div>
+      </section>
+
+      <!-- ==================== SETTINGS ==================== -->
+      <section class="page" id="p-settings">
+        <div class="settings">
+          <div class="snav" id="snav">
+            <div class="tag-label" style="padding:4px 12px 8px">หมวดการตั้งค่า</div>
+            <button class="snav-b on" data-s="ai">โมเดล AI</button>
+            <button class="snav-b" data-s="rules">เกณฑ์การตัดสิน</button>
+            <button class="snav-b" data-s="prompt">พร็อมท์</button>
+            <button class="snav-b" data-s="scms">SCMS &amp; จัดเก็บ</button>
+          </div>
+
+          <div class="spane">
+            <!-- AI -->
+            <div class="sgroup on" data-s="ai">
+              <h2>โมเดล AI</h2>
+              <p class="lead">การเชื่อมต่อ Gemini Multimodal สำหรับ OCR และอ่านเครื่องหมาย/ลายเซ็นในตาราง</p>
+              <div class="fld"><label>API Key</label>
+                <div style="display:flex;gap:8px"><input class="inp mono" type="password" value="AIzaSyD0000000000000000000000000000">
+                <button class="btn" onclick="app.testConn(this)">ทดสอบ</button></div>
+                <div class="hint">ต้องพิมพ์ <span class="mono">confirm change api</span> ก่อนบันทึกคีย์ใหม่</div></div>
+              <div class="g2">
+                <div class="fld"><label>โมเดล</label><select class="sel"><option>gemini-3.1-flash-lite</option><option>gemini-1.5-flash</option><option>gemini-1.5-pro</option></select></div>
+                <div class="fld"><label>ขนาดภาพก่อนส่ง</label><select class="sel"><option>2048 px (retry 3072 px)</option><option>3072 px</option></select>
+                  <div class="hint">JPEG quality 85 · ลด bandwidth</div></div>
+              </div>
+              <div class="srow"><div class="grow"><div class="s-t">ประมวลผลขนานกัน</div><div class="s-d">จำนวน worker thread ที่อ่านเอกสารพร้อมกัน</div></div>
+                <input class="inp num" style="width:74px" value="3"></div>
+              <div class="srow"><div class="grow"><div class="s-t">Retry อัตโนมัติเมื่ออ่านไม่ชัด</div><div class="s-d">ส่งซ้ำที่ความละเอียด 3072 px ก่อนตีเป็น unclear</div></div>
+                <label class="sw"><input type="checkbox" checked><span class="tr"></span></label></div>
+            </div>
+
+            <!-- rules -->
+            <div class="sgroup" data-s="rules">
+              <h2>เกณฑ์การตัดสิน</h2>
+              <p class="lead">ขั้นที่ 7 — ตัดสินว่าชุดเอกสารจะ Auto-Post หรือเข้าคิวให้เจ้าหน้าที่ตรวจ</p>
+              <div class="srow"><div class="grow"><div class="s-t">Confidence ขั้นต่ำสำหรับ Auto-Post</div><div class="s-d">ต่ำกว่านี้ส่งเข้าคิว Exception</div></div>
+                <input class="inp num" style="width:74px" value="95"><span style="color:var(--ink-3)">%</span></div>
+              <div class="srow"><div class="grow"><div class="s-t">ต้องอ่านครบทุกแถวในตาราง</div><div class="s-d">ขาดแถวใดแถวหนึ่ง = เข้าคิวทั้งชุด</div></div>
+                <label class="sw"><input type="checkbox" checked><span class="tr"></span></label></div>
+              <div class="srow"><div class="grow"><div class="s-t">Cross-check ชื่อ-สกุลกับ SCMS</div><div class="s-d">เทียบจากรหัส นศ. / เลขบัตร ปชช. ในตาราง</div></div>
+                <label class="sw"><input type="checkbox" checked><span class="tr"></span></label></div>
+              <div class="srow"><div class="grow"><div class="s-t">ฟอร์มไม่ใช่ของมหาวิทยาลัย = ไม่ผ่านทันที</div><div class="s-d">บังคับตาม Sequence Diagram · แก้ไขไม่ได้</div></div>
+                <span class="chip c-red">ล็อกไว้</span>
+                <label class="sw"><input type="checkbox" checked disabled><span class="tr"></span></label></div>
+              <div class="srow"><div class="grow"><div class="s-t">เคสหมายเหตุ “ปลอมแปลง” ห้าม Auto-Post</div><div class="s-d">ส่งนิติการเสมอ · แก้ไขไม่ได้</div></div>
+                <span class="chip c-red">ล็อกไว้</span>
+                <label class="sw"><input type="checkbox" checked disabled><span class="tr"></span></label></div>
+            </div>
+
+            <!-- prompt -->
+            <div class="sgroup" data-s="prompt">
+              <h2>พร็อมท์</h2>
+              <p class="lead">คำสั่งที่ส่งให้โมเดลอ่านและดึงข้อมูลรายแถวจากแบบยืนยันฯ</p>
+              <div class="fld"><label>เวอร์ชัน</label>
+                <select class="sel"><option>v4 — ใช้งานอยู่ (10 ส.ค. 2569)</option><option>v3 — 08 ส.ค. 2569</option><option>v2 — 02 ส.ค. 2569</option></select></div>
+              <textarea class="ta">You are a verification system for Sripatum University student-loan
+verification sheets returned by affiliated schools.
+
+For EVERY row in the signature table, extract:
+  row_no, student_id, citizen_id (13 digits), full_name,
+  marks[3]  -> "checked" | "unchecked" | "unclear",
+  handwritten_note (verbatim, null if none),
+  signature_present (bool)
+
+Rules:
+  - Never guess an unreadable digit. Return null.
+  - Report "confidence" (0..1) and "source_page" for every field.
+  - If the sheet is NOT the university form, set form_type="school"
+    and stop — do not attempt Auto-Post.
+
+Output: strict JSON, no prose.</textarea>
+              <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+                <span class="chip c-gray">ต้องพิมพ์ <span class="mono">confirm change prompt</span></span>
+                <span class="grow" style="margin-left:auto"></span>
+                <button class="btn">คืนค่าเริ่มต้น</button>
+                <button class="btn btn-pink" onclick="app.toast('ok','บันทึกพร็อมท์ v5 แล้ว (จำลอง)')">บันทึกเวอร์ชันใหม่</button>
+              </div>
+            </div>
+
+            <!-- scms -->
+            <div class="sgroup" data-s="scms">
+              <h2>SCMS &amp; จัดเก็บ</h2>
+              <p class="lead">ปลายทางการบันทึกผล (ขั้นที่ 10) และการเก็บหลักฐาน</p>
+              <div class="g2">
+                <div class="fld"><label>SCMS API Endpoint</label><input class="inp mono" value="https://scms.spu.ac.th/api/v1/verification"></div>
+                <div class="fld"><label>Service Account</label><input class="inp mono" value="svc-ai-verification"></div>
+              </div>
+              <div class="srow"><div class="grow"><div class="s-t">โหมดทดสอบ (Dry-run)</div><div class="s-d">ทำงานครบทุกขั้น แต่ไม่เขียนข้อมูลจริงลง SCMS</div></div>
+                <label class="sw"><input type="checkbox"><span class="tr"></span></label></div>
+              <div class="srow"><div class="grow"><div class="s-t">เก็บภาพต้นฉบับลง Audit Log / Storage</div><div class="s-d">พร้อม AI raw value + confidence + source page</div></div>
+                <label class="sw"><input type="checkbox" checked><span class="tr"></span></label></div>
+              <div class="srow"><div class="grow"><div class="s-t">ส่งเคสที่เจ้าหน้าที่แก้ไขกลับไป retrain โมเดล</div><div class="s-d">ตาม Sequence Diagram ขั้นที่ 6</div></div>
+                <label class="sw"><input type="checkbox" checked><span class="tr"></span></label></div>
+              <div class="srow"><div class="grow"><div class="s-t">แจ้งผลยืนยันวุฒิถึงนักศึกษาผ่าน SCMS</div><div class="s-d">หลังปิด Audit Trail ของชุดเอกสาร</div></div>
+                <label class="sw"><input type="checkbox" checked><span class="tr"></span></label></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask"></div>
+<aside class="sheetpanel" id="sp">
+  <div class="sp-hd">
+    <div style="flex:1"><div id="spTitle" style="font-size:14px;font-weight:600"></div>
+      <div id="spSub" style="font-size:11.5px;color:var(--ink-3)"></div></div>
+    <button class="tool" id="spClose">✕</button>
+  </div>
+  <div class="sp-bd" id="spBody"></div>
+</aside>
+
+<div class="toasts" id="toasts"></div>
+<script src="app.js"></script>
+</body>
+</html>

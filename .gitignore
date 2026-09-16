@@ -1,0 +1,11 @@
+.env
+frontend/.env
+.venv/
+__pycache__/
+*.pyc
+build/
+dist/
+dist_installer/
+dist_dmg_staging/
+*.spec
+.DS_Store
