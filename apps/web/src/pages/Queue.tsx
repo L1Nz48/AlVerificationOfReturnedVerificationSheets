@@ -93,7 +93,7 @@ export default function Queue() {
             <div className="sheet">
               <h4>มหาวิทยาลัยศรีปทุม — บัญชีรายชื่อนักศึกษา</h4>
               <div className="s-sub">ขอตรวจสอบวุฒิ · {doc.school_name || "-"}{doc.school_code ? ` (${doc.school_code})` : ""}</div>
-              <div style={{ display: "flex", gap: 18, fontSize: 10, color: "#5b5f6b", marginBottom: 8 }}>
+              <div className="sheet-meta">
                 <span>ที่ {doc.doc_no || "-"}</span><span>ชุดที่ {doc.set_no || "-"}</span>
                 <span style={{ marginLeft: "auto" }}>{doc.file_name}</span>
               </div>
@@ -216,7 +216,7 @@ export default function Queue() {
             <div className="qbar">
               <button className="btn btn-red" onClick={() => { setSel(null); rejectCase(doc.id); }}>ส่งกลับ / นิติการ</button>
               <span className="grow" />
-              <button className="btn btn-lime" onClick={doConfirm}>ยืนยัน → บันทึกเข้า SCMS</button>
+              <button className="btn btn-lime" onClick={doConfirm}>ยืนยันผลจำลอง</button>
             </div>
           </>
         )}

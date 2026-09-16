@@ -35,7 +35,7 @@ export default function Settings() {
     setTesting(true);
     const res = await api.testAi();
     setTesting(false);
-    if (res.ok) window.alert("เชื่อมต่อสำเร็จ — ตัวอ่าน: " + res.provider);
+    if (res.ok) window.alert("โหมดสาธิต — ตัวอ่าน: " + res.provider);
     else window.alert("เชื่อมต่อไม่สำเร็จ: " + res.error);
   };
 
@@ -52,13 +52,13 @@ export default function Settings() {
         {tab === "ai" && (
           <div className="sgroup on">
             <h2>โมเดล AI</h2>
-            <p className="lead">การเชื่อมต่อ Gemini Multimodal สำหรับ OCR และอ่านเครื่องหมาย/ลายเซ็นในตาราง</p>
-            <div className="fld"><label>API Key</label>
+            <p className="lead">Prototype ใช้ข้อมูลจำลอง ไม่มีการเรียก Gemini หรือส่งเอกสารออกจากเบราว์เซอร์</p>
+            <div className="fld"><label>ตัวอ่านเอกสาร</label>
               <div style={{ display: "flex", gap: 8 }}>
-                <input className="inp mono" type="password" disabled placeholder={form.has_api_key ? "•••••••• (ตั้งค่าไว้ใน .env แล้ว)" : "ยังไม่ได้ตั้งค่าใน .env"} />
-                <button className="btn" onClick={testAi} disabled={testing}>{testing ? "กำลังทดสอบ…" : "ทดสอบการเชื่อมต่อ"}</button>
+                <input className="inp mono" disabled value="ข้อมูลจำลองสำหรับการประชุม" readOnly />
+                <button className="btn" onClick={testAi} disabled={testing}>{testing ? "กำลังทดสอบ…" : "ดูสถานะโหมดสาธิต"}</button>
               </div>
-              <div className="hint">คีย์อ่านจากไฟล์ <span className="mono">.env</span> (ตัวแปร <span className="mono">GEMINI_API_KEY</span>) — ไม่เก็บไว้ในหน้าจอ</div>
+              <div className="hint">การตั้งค่าหน้านี้เก็บเฉพาะในเบราว์เซอร์ของเครื่องที่เปิดอยู่</div>
             </div>
             <div className="g2">
               <div className="fld"><label>โมเดล</label>
@@ -101,11 +101,11 @@ export default function Settings() {
         {tab === "prompt" && (
           <div className="sgroup on">
             <h2>พร็อมท์</h2>
-            <p className="lead">คำสั่งที่ส่งให้โมเดลอ่านและดึงข้อมูลรายแถวจากแบบยืนยันฯ</p>
+            <p className="lead">ตัวอย่างพร็อมท์สำหรับหารือในการประชุม ยังไม่มีการส่งข้อความนี้ให้โมเดล</p>
             <div className="fld"><label>พร็อมท์ที่ใช้งานอยู่ (แก้ไขได้)</label>
               <textarea className="ta" value={form.prompt} onChange={e => set("prompt", e.target.value)} /></div>
             <div style={{ display: "flex", gap: 8, marginTop: 12, alignItems: "center" }}>
-              <span className="chip c-gray">บันทึกแล้วมีผลกับรอบถัดไปทันที</span>
+              <span className="chip c-gray">บันทึกในเบราว์เซอร์เท่านั้น</span>
               <span className="grow" style={{ marginLeft: "auto" }} />
               <button className="btn btn-pink" onClick={save}>บันทึกพร็อมท์</button>
             </div>
@@ -115,18 +115,18 @@ export default function Settings() {
         {tab === "scms" && (
           <div className="sgroup on">
             <h2>SCMS &amp; จัดเก็บ</h2>
-            <p className="lead">ปลายทางการบันทึกผล (ขั้นที่ 10) และการเก็บหลักฐาน</p>
+            <p className="lead">แสดงหน้าตาการตั้งค่าที่จะใช้ในระบบจริง การบันทึกผลและการแจ้งเตือนใน Prototype เป็นการจำลองเท่านั้น</p>
             <div className="g2">
-              <div className="fld"><label>SCMS API Endpoint</label><input className="inp mono" value={form.scms_endpoint} onChange={e => set("scms_endpoint", e.target.value)} /></div>
-              <div className="fld"><label>Service Account</label><input className="inp mono" value={form.scms_account} onChange={e => set("scms_account", e.target.value)} /></div>
+              <div className="fld"><label>SCMS API Endpoint (ตัวอย่าง)</label><input className="inp mono" value={form.scms_endpoint} onChange={e => set("scms_endpoint", e.target.value)} /></div>
+              <div className="fld"><label>Service Account (ตัวอย่าง)</label><input className="inp mono" value={form.scms_account} onChange={e => set("scms_account", e.target.value)} /></div>
             </div>
             <div className="srow"><div className="grow"><div className="s-t">โหมดทดสอบ (Dry-run)</div><div className="s-d">ทำงานครบทุกขั้น แต่ไม่เขียนข้อมูลจริงลง SCMS</div></div>
-              <label className="sw"><input type="checkbox" checked={form.dry_run} onChange={e => set("dry_run", e.target.checked)} /><span className="tr" /></label></div>
+              <label className="sw"><input type="checkbox" checked disabled /><span className="tr" /></label></div>
             <div className="srow"><div className="grow"><div className="s-t">เก็บภาพต้นฉบับลง Audit Log / Storage</div><div className="s-d">พร้อม AI raw value + confidence + source page</div></div>
-              <label className="sw"><input type="checkbox" checked={form.store_original_scan} onChange={e => set("store_original_scan", e.target.checked)} /><span className="tr" /></label></div>
+              <label className="sw"><input type="checkbox" checked={false} disabled /><span className="tr" /></label></div>
             <div className="srow"><div className="grow"><div className="s-t">แจ้งผลยืนยันวุฒิถึงนักศึกษาผ่าน SCMS</div><div className="s-d">หลังปิด Audit Trail ของชุดเอกสาร</div></div>
-              <label className="sw"><input type="checkbox" checked={form.notify_student} onChange={e => set("notify_student", e.target.checked)} /><span className="tr" /></label></div>
-            <div className="srow"><span className="grow" /><button className="btn btn-pink" onClick={save}>บันทึกการตั้งค่า</button></div>
+              <label className="sw"><input type="checkbox" checked={false} disabled /><span className="tr" /></label></div>
+            <div className="srow"><button className="btn" onClick={() => { api.resetDemo(); window.location.reload(); }}>เริ่มข้อมูลสาธิตใหม่</button><span className="grow" /><button className="btn btn-pink" onClick={save}>บันทึกการตั้งค่า</button></div>
           </div>
         )}
       </div>

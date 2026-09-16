@@ -1,5 +1,9 @@
 .env
 frontend/.env
+apps/web/.env
+node_modules/
+apps/web/node_modules/
+apps/web/dist/
 .venv/
 __pycache__/
 *.pyc

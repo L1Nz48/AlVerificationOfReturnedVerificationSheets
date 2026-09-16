@@ -23,11 +23,6 @@ const ITEMS: { page: Page; cap: string; sub: string; icon: React.ReactNode; badg
 export default function Rail() {
   const { state, go } = useApp();
 
-  const toggleTheme = () => {
-    const el = document.documentElement;
-    el.dataset.theme = el.dataset.theme === "dark" ? "light" : "dark";
-  };
-
   return (
     <nav className="rail">
       <div className="rail-brand">
@@ -36,7 +31,7 @@ export default function Rail() {
         </div>
         <div>
           <div className="rb-t">ผู้ช่วยตรวจเอกสาร AI</div>
-          <div className="rb-s">แบบยืนยันฯ ที่ส่งกลับ · SPU</div>
+          <div className="rb-s">Prototype · ข้อมูลสมมติ</div>
         </div>
       </div>
 
@@ -62,9 +57,6 @@ export default function Rail() {
           <div className="rf-n">อรุณี บุญมี</div>
           <div className="rf-r">เจ้าหน้าที่งานทะเบียน</div>
         </div>
-        <button className="tool" title="สลับธีม" style={{ width: 30, height: 30 }} onClick={toggleTheme}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
-        </button>
       </div>
     </nav>
   );

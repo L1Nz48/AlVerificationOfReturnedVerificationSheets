@@ -1,4 +1,4 @@
-"""หน้าบ้าน JSON-RPC ที่ JavaScript เรียกผ่าน window.pywebview.api.<method>()"""
+"""Application service used by the HTTP API and command line interface."""
 
 from typing import List, Optional
 
@@ -13,7 +13,6 @@ class Api:
         self.settings = settings or Settings.load()
         self.storage = Storage(self.settings)
         self.pipeline = Pipeline(self.settings, self.storage)
-        self.window = None
 
     # ---- ทั่วไป ----------------------------------------------------------
     def ping(self) -> dict:
@@ -37,19 +36,6 @@ class Api:
             return {"ok": True, "provider": ex.name}
         except Exception as exc:                         # noqa: BLE001
             return {"ok": False, "error": str(exc)}
-
-    def choose_folder(self, kind: str = "source") -> dict:
-        """เปิดหน้าต่างเลือกโฟลเดอร์ของระบบปฏิบัติการ"""
-        if self.window is None:
-            return {"ok": False, "error": "ไม่ได้รันในหน้าต่างเดสก์ท็อป"}
-        import webview
-
-        picked = self.window.create_file_dialog(webview.FOLDER_DIALOG)
-        if not picked:
-            return {"ok": False, "cancelled": True}
-        path = picked[0]
-        self.settings.update({"source_dir" if kind == "source" else "archive_dir": path})
-        return {"ok": True, "path": path}
 
     # ---- ขั้นที่ 3–7 -----------------------------------------------------
     def scan_source(self) -> dict:

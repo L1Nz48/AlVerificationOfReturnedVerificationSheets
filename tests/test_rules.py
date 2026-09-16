@@ -4,7 +4,7 @@ import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "apps" / "api"))
 
 from app.config import Settings                                          # noqa: E402
 from app.models import (DocResult, RowResult, FORM_OTHER, FORM_SPU,      # noqa: E402

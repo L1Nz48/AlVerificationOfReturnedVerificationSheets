@@ -188,10 +188,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const info = await api.ping();
         dispatch({ type: "SET_BACKEND_INFO", info });
       } catch {
-        toast("err", "เชื่อมต่อ backend ไม่ได้ — ตรวจสอบว่ารัน uvicorn app.server:app แล้วหรือยัง");
+        toast("err", "เชื่อมต่อ API ไม่ได้ — ตรวจสอบว่า FastAPI ทำงานอยู่");
       }
       try { dispatch({ type: "SET_SETTINGS", settings: await api.getSettings() }); } catch { /* ignore */ }
-      try { await api.scanSource(); } catch { /* ignore */ }
+      try { const scan = await api.scanSource(); dispatch({ type: "SET_POLL_STATE", running: false, step: 0, stepName: "", currentFile: "", elapsed: 0, sourceFiles: scan.count }); } catch { /* ignore */ }
       await refreshAll();
     })();
     const id = setInterval(poll, 450);
@@ -220,7 +220,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const resetView = useCallback(async () => {
     dispatch({ type: "RESET_VIEW" });
-    toast("info", "ล้างผลบนหน้าจอแล้ว (ข้อมูลในฐานข้อมูลยังอยู่)");
+    toast("info", "ล้างผลบนหน้าจอแล้ว (ข้อมูลจำลองยังอยู่ในเบราว์เซอร์)");
   }, [toast]);
 
   const clearLogs = useCallback(() => dispatch({ type: "CLEAR_LOGS" }), []);
@@ -236,7 +236,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const confirmCase = useCallback(async (id: number, rows: unknown[]) => {
     const res = await api.confirmCase(id, rows);
     if (!res || !res.ok) { toast("err", "บันทึกไม่สำเร็จ: " + (res?.error || "ไม่ทราบสาเหตุ")); return; }
-    toast("ok", "บันทึกเข้า SCMS แล้ว" + (res.edited_rows ? " · แก้ไข " + res.edited_rows + " แถว (edited flag)" : ""));
+    toast("ok", "ยืนยันผลจำลองแล้ว" + (res.edited_rows ? " · แก้ไข " + res.edited_rows + " แถว" : ""));
     dispatch({ type: "SET_SEL", id: null });
     await refreshAll();
   }, [refreshAll, toast]);
@@ -244,7 +244,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const rejectCase = useCallback(async (id: number) => {
     const res = await api.rejectCase(id, "ส่งกลับให้โรงเรียนต้นสังกัดแก้ไข");
     if (!res || !res.ok) { toast("err", "ส่งกลับไม่สำเร็จ"); return; }
-    toast("warn", "ส่งเคสกลับโรงเรียนต้นสังกัดแล้ว");
+    toast("warn", "เปลี่ยนสถานะเคสเป็นส่งกลับ (จำลอง)");
     dispatch({ type: "SET_SEL", id: null });
     await refreshAll();
   }, [refreshAll, toast]);
@@ -263,7 +263,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const uploadFiles = useCallback(async (files: FileList) => {
     try {
       const res = await api.upload(files);
-      toast("ok", `อัปโหลดแล้ว ${res.uploaded.length} ไฟล์`);
+      dispatch({ type: "SET_POLL_STATE", running: false, step: 0, stepName: "", currentFile: "", elapsed: 0, sourceFiles: res.count });
+      toast("ok", `รับชื่อไฟล์ตัวอย่างแล้ว ${res.uploaded.length} ไฟล์ — ไม่มีการอ่านหรือส่งเนื้อหาไฟล์`);
     } catch {
       toast("err", "อัปโหลดไม่สำเร็จ");
     }

@@ -16,9 +16,6 @@ export default function Header() {
   const { openPanel } = usePanel();
   const [step, title, sub] = META[state.page];
 
-  const rate = state.elapsed && state.docs.length
-    ? (state.docs.length / (state.elapsed / 60)).toFixed(1) + " ชุด/นาที" : "—";
-
   return (
     <header className="hdr">
       <span className="hdr-step">{step}</span>
@@ -29,9 +26,9 @@ export default function Header() {
 
       <div className="telemetry">
         <div className="tm live"><span className="tm-k">สถานะ</span><span className="tm-v">{state.running ? "ทำงาน" : state.docs.length ? "เสร็จแล้ว" : "พร้อม"}</span></div>
-        <div className="tm"><span className="tm-k">ความเร็ว</span><span className="tm-v">{rate}</span></div>
+        <div className="tm"><span className="tm-k">ชุดเอกสาร</span><span className="tm-v">{state.docs.length}</span></div>
         <div className="tm warn"><span className="tm-k">รอตรวจ</span><span className="tm-v">{state.queue.length}</span></div>
-        <div className="tm ok"><span className="tm-k">SCMS</span><span className="tm-v">{state.backendInfo?.backend === "mysql" ? "MySQL" : "SQLite"}</span></div>
+        <div className="tm ok"><span className="tm-k">โหมด</span><span className="tm-v">Prototype</span></div>
         <div className="hdr-tools">
           <button className="tool" title="คำอธิบายขอบเขตระบบ" onClick={() => openPanel("ขอบเขตของโปรแกรม", "เทียบกับ To-Be End-to-End Flow", <HelpPanel />)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M9.6 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.7" /><path d="M12 17h.01" /></svg>

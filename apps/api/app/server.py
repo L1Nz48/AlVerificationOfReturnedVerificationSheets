@@ -1,13 +1,15 @@
-"""HTTP API (FastAPI) ครอบ Api เดิม — ให้เว็บ (React) เรียกผ่าน REST แทน pywebview js_api"""
+"""HTTP API for the React website."""
 
 from pathlib import Path
 from typing import List, Optional
 
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from .api import Api
+from .config import ROOT
 
 app = FastAPI(title="AI Verification API")
 app.add_middleware(
@@ -133,3 +135,9 @@ def get_audit(run_id: int) -> List[dict]:
 @app.get("/api/dashboard")
 def get_dashboard() -> dict:
     return api.get_dashboard()
+
+
+# A built web app can be served from the same origin as the API.
+WEB_DIST = ROOT / "apps" / "web" / "dist"
+if WEB_DIST.is_dir():
+    app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")
