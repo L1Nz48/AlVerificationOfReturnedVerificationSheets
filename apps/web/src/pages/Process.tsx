@@ -97,7 +97,7 @@ export default function Process() {
 
     <div className="process-bottom">
       <section className="panel process-results">
-        <div className="process-block-head"><div><h3>ผลการประมวลผล</h3><p>กดดูรายละเอียดหรือไปตรวจเคสที่ยังรอเจ้าหน้าที่</p></div><button className="btn btn-sm btn-ghost" onClick={() => go("queue")}>เปิดคิวตรวจ →</button></div>
+        <div className="process-block-head"><div><h3>ผลการประมวลผล</h3></div><button className="btn btn-sm btn-ghost" onClick={() => go("queue")}>เปิดคิวตรวจ →</button></div>
         <div className="process-filters">{(["all", "auto", "exception"] as const).map(f => <button key={f} className={state.filter === f ? "active" : ""} onClick={() => setFilter(f)}>
           {f === "all" ? "ทั้งหมด" : f === "auto" ? "ผ่านอัตโนมัติ" : "รอตรวจ"}<span>{f === "all" ? state.docs.length : f === "auto" ? auto : review}</span>
         </button>)}</div>

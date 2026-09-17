@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cc, pct } from "../lib/format";
 import { useApp } from "../state/store";
 import type { DocResult, RowResult } from "../types";
@@ -29,24 +29,72 @@ export default function Queue() {
   const { state, setSel, openCase, confirmCase, rejectCase } = useApp();
   const [edits, setEdits] = useState<Record<number, RowPatch>>({});
   const [schoolFilter, setSchoolFilter] = useState("");
+  const [schoolQuery, setSchoolQuery] = useState("");
+  const [schoolMenuOpen, setSchoolMenuOpen] = useState(false);
+  const schoolPicker = useRef<HTMLDivElement>(null);
+  const schoolSearch = useRef<HTMLInputElement>(null);
+  const schoolTrigger = useRef<HTMLButtonElement>(null);
 
   const queue = state.queue;
   const schoolNames = [...new Set(queue.map(schoolOf))].sort((a, b) => a.localeCompare(b, "th"));
+  const matchingSchools = schoolNames.filter(name => name.toLocaleLowerCase().includes(schoolQuery.trim().toLocaleLowerCase()));
   const activeSchool = schoolNames.includes(schoolFilter) ? schoolFilter : "";
   const visibleQueue = activeSchool ? queue.filter(d => schoolOf(d) === activeSchool) : queue;
   const sel = state.sel != null && visibleQueue.some(d => d.id === state.sel) ? state.sel : (visibleQueue[0]?.id ?? null);
   const doc = visibleQueue.find(d => d.id === sel);
+  const chooseSchool = (name: string) => {
+    setSchoolFilter(name);
+    setSchoolQuery("");
+    setSchoolMenuOpen(false);
+    schoolTrigger.current?.focus();
+  };
   const queueHeader = <div className="qcol-hd queue-list-head">
     <div className="queue-list-title"><h3>คิวรอตรวจสอบ</h3><span className="chip c-amber num">{visibleQueue.length}</span></div>
-    <label htmlFor="queue-school-filter">ค้นหาโรงเรียน</label>
-    <select id="queue-school-filter" className="queue-school-select" value={activeSchool}
-      onChange={e => setSchoolFilter(e.target.value)} disabled={!schoolNames.length}>
-      <option value="">ทุกโรงเรียน</option>
-      {schoolNames.map(name => <option key={name} value={name}>{name}</option>)}
-    </select>
+    <span id="queue-school-label">ค้นหาโรงเรียน</span>
+    <div className="queue-school-picker" ref={schoolPicker}>
+      <button ref={schoolTrigger} type="button" className="queue-school-trigger" disabled={!schoolNames.length}
+        aria-label={`คัดกรองโรงเรียน: ${activeSchool || "ทุกโรงเรียน"}`} aria-expanded={schoolMenuOpen}
+        onClick={() => { setSchoolQuery(""); setSchoolMenuOpen(open => !open); }}>
+        <span>{activeSchool || "ทุกโรงเรียน"}</span><span aria-hidden="true">⌄</span>
+      </button>
+      {schoolMenuOpen && <div className="queue-school-menu">
+        <input ref={schoolSearch} className="queue-school-search" type="search" value={schoolQuery}
+          placeholder="ค้นหาชื่อโรงเรียน" aria-label="ค้นหาชื่อโรงเรียนในตัวเลือก"
+          onChange={e => setSchoolQuery(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (!schoolQuery.trim()) chooseSchool("");
+              else if (matchingSchools[0]) chooseSchool(matchingSchools[0]);
+            }
+          }} />
+        <div className="queue-school-options">
+          {!schoolQuery.trim() && <button type="button" className={!activeSchool ? "selected" : ""} onClick={() => chooseSchool("")}>ทุกโรงเรียน</button>}
+          {matchingSchools.map(name => <button type="button" key={name} className={activeSchool === name ? "selected" : ""}
+            onClick={() => chooseSchool(name)}>{name}</button>)}
+          {!matchingSchools.length && <div className="queue-school-empty">ไม่พบโรงเรียน</div>}
+        </div>
+      </div>}
+    </div>
   </div>;
 
   useEffect(() => { setEdits({}); }, [sel]);
+  useEffect(() => {
+    if (!schoolMenuOpen) return;
+    schoolSearch.current?.focus();
+    const closeOutside = (event: PointerEvent) => {
+      if (!schoolPicker.current?.contains(event.target as Node)) setSchoolMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setSchoolMenuOpen(false); schoolTrigger.current?.focus(); }
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [schoolMenuOpen]);
 
   if (!queue.length) {
     return (
@@ -229,9 +277,9 @@ export default function Queue() {
             ))}
 
             <div className="qbar">
-              <button className="btn btn-red" onClick={() => { setSel(null); rejectCase(doc.id); }}>ส่งกลับ / นิติการ</button>
+              <button className="btn btn-red" onClick={() => { setSel(null); rejectCase(doc.id); }}>ส่งกลับ</button>
               <span className="grow" />
-              <button className="btn btn-lime" onClick={doConfirm}>ยืนยันผลจำลอง</button>
+              <button className="btn btn-lime" onClick={doConfirm}>ยืนยันผล</button>
             </div>
           </>
         )}

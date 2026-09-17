@@ -51,6 +51,7 @@ export default function Dashboard() {
     schools.forEach(docs => { groups.all.push(docs); groups[schoolCategory(docs)].push(docs); });
     return groups;
   }, [state.docs]);
+  const totalSchools = grouped.all.length;
   const current = categories.find(c => c.id === selected);
   const search = query.trim().toLocaleLowerCase();
   const schoolDocs = selectedSchool ? grouped.all.find(school => schoolName(school[0]) === selectedSchool) || [] : [];
@@ -68,9 +69,11 @@ export default function Dashboard() {
       <div className="mini-cards" aria-label="หมวดหมู่การตรวจสอบ">
         {categories.map(c => {
           const list = grouped[c.id];
+          const percentage = totalSchools ? Math.round(list.length / totalSchools * 100) : 0;
           return <button key={c.id} type="button" className={`mini-card mini-${c.tone}${selected === c.id ? " selected" : ""}`}
             aria-pressed={selected === c.id} onClick={() => { setSelected(c.id); setSelectedSchool(null); setQuery(""); }}>
-            <strong>{list.length}</strong><span className="mini-card-title">{c.title}</span><small>{c.detail}</small>
+            <span className="mini-card-metrics"><strong>{list.length}</strong><span className="mini-card-percent" aria-label={`${percentage}% ของโรงเรียนทั้งหมด`}>{percentage}%</span></span>
+            <span className="mini-card-title">{c.title}</span><small>{c.detail}</small>
             <span className="mini-card-foot">{list.reduce((n, school) => n + school.length, 0)} ชุดเอกสาร</span>
           </button>;
         })}

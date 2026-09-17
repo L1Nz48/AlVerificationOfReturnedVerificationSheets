@@ -31,7 +31,7 @@ export default function Rail() {
         </div>
         <div>
           <div className="rb-t">ผู้ช่วยตรวจเอกสาร AI</div>
-          <div className="rb-s">Prototype · ข้อมูลสมมติ</div>
+          <div className="rb-s">Prototype</div>
         </div>
       </div>
 
