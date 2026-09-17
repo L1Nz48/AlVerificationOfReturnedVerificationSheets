@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { cc, pct } from "../lib/format";
 import { useApp } from "../state/store";
-import type { RowResult } from "../types";
+import type { DocResult, RowResult } from "../types";
 
 const POS: Record<string, string> = { graduation: "pass", doc_date: "correct", degree: "correct" };
 const NEG: Record<string, string> = { graduation: "fail", doc_date: "incorrect", degree: "incorrect" };
@@ -23,21 +23,35 @@ function cellPair(value: string | null, group: string) {
 }
 
 type RowPatch = Partial<Pick<RowResult, "student_id" | "full_name" | "faculty" | "graduation" | "doc_date" | "degree" | "note">>;
+const schoolOf = (doc: DocResult) => doc.school_name?.trim() || "ไม่ระบุโรงเรียน";
 
 export default function Queue() {
   const { state, setSel, openCase, confirmCase, rejectCase } = useApp();
   const [edits, setEdits] = useState<Record<number, RowPatch>>({});
+  const [schoolFilter, setSchoolFilter] = useState("");
 
   const queue = state.queue;
-  const sel = state.sel != null && queue.some(d => d.id === state.sel) ? state.sel : (queue[0]?.id ?? null);
-  const doc = queue.find(d => d.id === sel);
+  const schoolNames = [...new Set(queue.map(schoolOf))].sort((a, b) => a.localeCompare(b, "th"));
+  const activeSchool = schoolNames.includes(schoolFilter) ? schoolFilter : "";
+  const visibleQueue = activeSchool ? queue.filter(d => schoolOf(d) === activeSchool) : queue;
+  const sel = state.sel != null && visibleQueue.some(d => d.id === state.sel) ? state.sel : (visibleQueue[0]?.id ?? null);
+  const doc = visibleQueue.find(d => d.id === sel);
+  const queueHeader = <div className="qcol-hd queue-list-head">
+    <div className="queue-list-title"><h3>คิวรอตรวจสอบ</h3><span className="chip c-amber num">{visibleQueue.length}</span></div>
+    <label htmlFor="queue-school-filter">ค้นหาโรงเรียน</label>
+    <select id="queue-school-filter" className="queue-school-select" value={activeSchool}
+      onChange={e => setSchoolFilter(e.target.value)} disabled={!schoolNames.length}>
+      <option value="">ทุกโรงเรียน</option>
+      {schoolNames.map(name => <option key={name} value={name}>{name}</option>)}
+    </select>
+  </div>;
 
   useEffect(() => { setEdits({}); }, [sel]);
 
   if (!queue.length) {
     return (
       <div className="q3">
-        <div className="qcol qcol-list"><div className="qcol-hd"><h3>คิวรอตรวจสอบ</h3><span className="grow" /><span className="chip c-amber num">0</span></div>
+        <div className="qcol qcol-list">{queueHeader}
           <div className="empty">ไม่มีเคสค้างในคิว<br /><span style={{ fontSize: 11 }}>เอกสารทั้งหมดผ่านเกณฑ์อัตโนมัติแล้ว</span></div>
         </div>
         <div className="qcol qcol-doc"><div className="qcol-hd"><h3>ภาพเอกสารต้นฉบับ</h3></div><div className="scan-stage"><div className="empty">ไม่มีเอกสารให้แสดง</div></div></div>
@@ -70,11 +84,12 @@ export default function Queue() {
   return (
     <div className="q3">
       <div className="qcol qcol-list">
-        <div className="qcol-hd"><h3>คิวรอตรวจสอบ</h3><span className="grow" /><span className="chip c-amber num">{queue.length}</span></div>
+        {queueHeader}
         <div>
-          {queue.map(d => (
+          {visibleQueue.map(d => (
             <button key={d.id} className={"qi" + (sel === d.id ? " on" : "")} onClick={() => openCase(d.id)}>
-              <div className="qi-f">{d.file_name}</div>
+              <div className="qi-f">{schoolOf(d)}</div>
+              <div className="qi-file">{d.file_name}</div>
               <div className="qi-m">
                 <span className={"chip " + (d.form_type === "spu" ? "c-cyan" : "c-red")}>{d.form_type === "spu" ? "SPU" : "ไม่ใช่ฟอร์ม SPU"}</span>
                 <span>{d.row_count} แถว</span>
@@ -146,8 +161,8 @@ export default function Queue() {
         {doc && (
           <>
             <div className="qcol-hd">
-              <div><h3>{doc.file_name}</h3>
-                <div className="tag-label">{doc.school_name || "-"} · {doc.row_count} แถว · อ่านได้ {doc.readable_rows}/{doc.row_count}</div></div>
+              <div><h3>{doc.school_name || "ไม่ระบุโรงเรียน"}</h3>
+                <div className="tag-label">{doc.file_name} · {doc.row_count} แถว · อ่านได้ {doc.readable_rows}/{doc.row_count}</div></div>
               <span className="grow" />
               <span className="chip c-amber">รอการยืนยัน</span>
             </div>
@@ -155,7 +170,7 @@ export default function Queue() {
             <div className="panel-bd" style={{ padding: "14px 18px 0" }}>
               <div className={"ribbon" + (doc.form_type === "other" ? " red" : "")}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flex: "none", marginTop: 2 }}><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /><path d="M12 9v4M12 17h.01" /></svg>
-                <div><b>เหตุผลที่ไม่ผ่านเกณฑ์อัตโนมัติ</b>
+                <div><b>หมายเหตุ</b>
                   <ul>{(doc.reasons || []).map((r, i) => <li key={i}>{r}</li>)}</ul></div>
               </div>
             </div>

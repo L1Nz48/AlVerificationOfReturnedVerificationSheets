@@ -1,21 +1,21 @@
 import { useApp } from "../state/store";
 import type { Page } from "../types";
 
-const ITEMS: { page: Page; cap: string; sub: string; icon: React.ReactNode; badge?: boolean }[] = [
+const ITEMS: { page: Page; cap: string; icon: React.ReactNode; badge?: boolean }[] = [
   {
-    page: "dashboard", cap: "หน้าหลัก", sub: "ภาพรวมการทำงาน",
+    page: "dashboard", cap: "หน้าหลัก",
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>,
   },
   {
-    page: "process", cap: "ประมวลผลเอกสาร", sub: "ขั้นที่ 3–7",
+    page: "process", cap: "ประมวลผลเอกสาร",
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="m9 15 2 2 4-4" /></svg>,
   },
   {
-    page: "queue", cap: "คิวตรวจสอบ", sub: "ขั้นที่ 8–9 · เจ้าหน้าที่", badge: true,
+    page: "queue", cap: "คิวตรวจสอบ", badge: true,
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /><path d="M12 9v4M12 17h.01" /></svg>,
   },
   {
-    page: "history", cap: "ประวัติการทำงาน", sub: "Audit trail",
+    page: "history", cap: "ประวัติการทำงาน",
     icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 4v5h5" /><path d="M3.5 13a8.5 8.5 0 1 0 2.4-6.2L3 9" /><path d="M12 8v4.5l3 1.8" /></svg>,
   },
 ];
@@ -40,7 +40,7 @@ export default function Rail() {
       {ITEMS.map(it => (
         <button key={it.page} className={"rail-btn" + (state.page === it.page ? " on" : "")} onClick={() => go(it.page)}>
           {it.icon}
-          <span><span className="rb-cap">{it.cap}</span><span className="rb-sub">{it.sub}</span></span>
+          <span className="rb-cap">{it.cap}</span>
           {it.badge && <span className="rb-dot" style={{ display: state.queue.length ? "" : "none" }}>{state.queue.length}</span>}
         </button>
       ))}
@@ -48,7 +48,7 @@ export default function Rail() {
       <div className="rail-sep" />
       <button className={"rail-btn" + (state.page === "settings" ? " on" : "")} onClick={() => go("settings")}>
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" /></svg>
-        <span><span className="rb-cap">ตั้งค่า</span><span className="rb-sub">AI · เกณฑ์ · โฟลเดอร์</span></span>
+        <span className="rb-cap">ตั้งค่า</span>
       </button>
 
       <div className="rail-foot">

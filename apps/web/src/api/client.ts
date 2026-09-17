@@ -6,6 +6,12 @@ const now = () => new Date().toLocaleString("th-TH");
 const time = () => new Date().toLocaleTimeString("th-TH", { hour12: false });
 
 const sampleNames = ["นายกิตติ ตัวอย่าง", "นางสาวปาริชาติ สมมติ", "นายธีรภัทร สาธิต", "นางสาวณิชา ทดลอง", "นายธนภัทร ใจดี", "นางสาวพิชญา แสงทอง", "นายภาคิน วิริยะ", "นางสาววรินทร์ สุขใจ", "นายชยพล ศึกษาดี", "นางสาวอัญชลี มั่นคง"];
+const sampleSchools = [
+  { name: "โรงเรียนสาธิตตัวอย่าง", code: "00040381" },
+  { name: "โรงเรียนประชาศึกษา (ข้อมูลสมมติ)", code: "00040382" },
+  { name: "วิทยาลัยตัวอย่าง", code: "00040383" },
+];
+const schoolFor = (id: number) => sampleSchools[id <= 6 ? [0, 1, 2, 1, 1, 0][id - 1] : id % 3];
 function row(docId: number, no: number, variant: "ok" | "negative" | "unclear" = "ok"): RowResult {
   return {
     row_no: no, student_id: `6805${String(docId).padStart(2, "0")}${String(no).padStart(2, "0")}`, full_name: sampleNames[(docId * 3 + no) % sampleNames.length],
@@ -23,12 +29,21 @@ function document(id: number, name: string, variant: "ok" | "negative" | "unclea
   if (variant === "escalate") rows[1].note = "สงสัยเอกสารปลอมแปลง";
   return {
     id, file_name: name, form_type: variant === "other" ? "other" : "spu", doc_no: `มหป.(ตทน) 01933/2569`, set_no: String(68530 + id),
-    school_name: ["โรงเรียนสาธิตตัวอย่าง", "โรงเรียนประชาศึกษา (ข้อมูลสมมติ)", "วิทยาลัยตัวอย่าง"][id % 3], school_code: `00040${String(380 + id)}`,
+    school_name: schoolFor(id).name, school_code: schoolFor(id).code,
     verifier_signed: variant !== "unclear", verifier_name: variant === "unclear" ? null : "ผู้ตรวจสอบ ตัวอย่าง", verifier_position: "งานทะเบียน",
     rows, row_count: rows.length, readable_rows: variant === "unclear" ? 2 : 3, min_confidence: auto ? 0.98 : 0.78,
     verdict: auto ? "auto" : "exception", reasons: auto ? [] : [variant === "other" ? "ไม่ใช่แบบฟอร์มของมหาวิทยาลัย" : variant === "negative" ? "ผลตรวจไม่ตรงกับข้อมูลที่คาดไว้" : variant === "escalate" ? "พบหมายเหตุส่อว่าปลอมแปลง ต้องส่งต่อพิจารณา" : variant === "completed" ? "เจ้าหน้าที่ตรวจสอบและยืนยันแล้ว" : "อ่านผลตรวจไม่ชัดหรือไม่พบลายมือชื่อ"],
     status: auto ? "posted" : variant === "completed" ? "confirmed" : "pending",
   };
+}
+
+const showcaseFiles = [
+  { file: "SAMPLE-COMPLETED-SCHOOL.pdf", school: "โรงเรียนวิทยพัฒน์ (ข้อมูลสมมติ)", code: "00040384", variant: "completed" },
+  { file: "SAMPLE-FOLLOWUP-SCHOOL.pdf", school: "โรงเรียนศรีการศึกษา (ข้อมูลสมมติ)", code: "00040385", variant: "unclear" },
+] as const;
+
+function showcaseDocument(id: number, sample: typeof showcaseFiles[number]): DocResult {
+  return { ...document(id, sample.file, sample.variant), school_name: sample.school, school_code: sample.code };
 }
 
 const defaults: Settings = {
@@ -39,15 +54,42 @@ const defaults: Settings = {
 
 type DemoData = { docs: DocResult[]; runs: RunSummary[]; settings: Settings; uploads: string[]; audit: Record<number, AuditEntry[]> };
 const seed = (): DemoData => ({
-  docs: [document(1, "SAMPLE-VERIFY-001.pdf", "ok"), document(2, "SAMPLE-VERIFY-002.pdf", "negative"), document(3, "SAMPLE-VERIFY-003.pdf", "unclear"), document(4, "SAMPLE-VERIFY-004.pdf", "other"), document(5, "SAMPLE-VERIFY-005.pdf", "escalate"), document(6, "SAMPLE-VERIFY-006.pdf", "completed")],
-  runs: [{ id: 1, started_at: now(), finished_at: now(), total: 6, auto: 1, exception: 5, posted: 2, status: "done", operator: "เจ้าหน้าที่ (จำลอง)" }],
+  docs: [document(1, "SAMPLE-VERIFY-001.pdf", "ok"), document(2, "SAMPLE-VERIFY-002.pdf", "negative"), document(3, "SAMPLE-VERIFY-003.pdf", "unclear"), document(4, "SAMPLE-VERIFY-004.pdf", "other"), document(5, "SAMPLE-VERIFY-005.pdf", "escalate"), document(6, "SAMPLE-VERIFY-006.pdf", "completed"), ...showcaseFiles.map((sample, index) => showcaseDocument(index + 7, sample))],
+  runs: [{ id: 1, started_at: now(), finished_at: now(), total: 8, auto: 1, exception: 7, posted: 3, status: "done", operator: "เจ้าหน้าที่ (จำลอง)" }],
   settings: defaults, uploads: [], audit: { 1: [{ ts: now(), action: "demo_run", actor: "ระบบจำลอง", detail: { file: "SAMPLE-VERIFY-001.pdf" } }] },
 });
 
 function restore(): DemoData {
   try {
     const saved = localStorage.getItem(KEY);
-    if (saved) return JSON.parse(saved) as DemoData;
+    if (saved) {
+      const restored = JSON.parse(saved) as DemoData;
+      // Bring existing demo browsers onto the school-level sample without discarding edits.
+      restored.docs.forEach(doc => {
+        if (doc.id >= 1 && doc.id <= 6 && doc.file_name === `SAMPLE-VERIFY-${String(doc.id).padStart(3, "0")}.pdf`) {
+          doc.school_name = schoolFor(doc.id).name;
+          doc.school_code = schoolFor(doc.id).code;
+        }
+      });
+      const added: DocResult[] = [];
+      let nextId = Math.max(0, ...restored.docs.map(doc => doc.id)) + 1;
+      showcaseFiles.forEach(sample => {
+        if (restored.docs.some(doc => doc.file_name === sample.file)) return;
+        const doc = showcaseDocument(nextId++, sample);
+        restored.docs.push(doc);
+        added.push(doc);
+      });
+      if (added.length) {
+        const runId = Math.max(0, ...restored.runs.map(run => run.id)) + 1;
+        restored.runs.unshift({ id: runId, started_at: now(), finished_at: now(), total: added.length,
+          auto: added.filter(doc => doc.verdict === "auto").length, exception: added.filter(doc => doc.verdict === "exception").length,
+          posted: added.filter(doc => doc.status === "posted" || doc.status === "confirmed").length,
+          status: "done", operator: "ระบบจำลอง" });
+        restored.audit[runId] = added.map(doc => ({ ts: now(), action: "demo_sample_added", actor: "ระบบจำลอง", detail: { file: doc.file_name } }));
+        try { localStorage.setItem(KEY, JSON.stringify(restored)); } catch { /* demo still works in memory */ }
+      }
+      return restored;
+    }
   } catch { /* private mode or invalid storage */ }
   return seed();
 }
@@ -71,7 +113,7 @@ export const api = {
     save(); return { ok: true, settings: { ...data.settings } };
   },
   testAi: async (): Promise<{ ok: boolean; provider?: string; error?: string }> => ({ ok: true, provider: "ตัวอ่านจำลอง — ไม่มีการเรียก AI จริง" }),
-  upload: async (files: FileList) => {
+  upload: async (files: File[]) => {
     const names = Array.from(files).map(f => f.name);
     data.uploads.push(...names); save();
     return { ok: true, count: data.uploads.length, source_dir: data.settings.source_dir, archive_dir: data.settings.archive_dir, uploaded: names };

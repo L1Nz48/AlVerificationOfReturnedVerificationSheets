@@ -105,7 +105,7 @@ interface Ctx {
   rejectCase: (id: number) => Promise<void>;
   saveSettings: (patch: Partial<Settings>) => Promise<void>;
   reloadSettings: () => Promise<void>;
-  uploadFiles: (files: FileList) => Promise<void>;
+  uploadFiles: (files: File[]) => Promise<void>;
 }
 
 const AppContext = createContext<Ctx | null>(null);
@@ -260,7 +260,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try { dispatch({ type: "SET_SETTINGS", settings: await api.getSettings() }); } catch { /* ignore */ }
   }, []);
 
-  const uploadFiles = useCallback(async (files: FileList) => {
+  const uploadFiles = useCallback(async (files: File[]) => {
     try {
       const res = await api.upload(files);
       dispatch({ type: "SET_POLL_STATE", running: false, step: 0, stepName: "", currentFile: "", elapsed: 0, sourceFiles: res.count });
